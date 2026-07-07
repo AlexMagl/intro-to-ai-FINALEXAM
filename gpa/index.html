@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator - Computer Science</title>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border: #E5E7EB;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        h2 {
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .ai-btn-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            max-width: 300px;
+            margin-top: 0.5rem;
+        }
+
+        /* Tooltip/Modal Styles */
+        .info-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .info-icon {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .tooltip-modal {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 35px;
+            width: 500px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            z-index: 100;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+
+        .info-wrapper:hover .tooltip-modal {
+            display: block;
+        }
+
+        .tooltip-modal h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #F3F4F6;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: #F9FAFB;
+        }
+
+        .passed-no {
+            color: #DC2626;
+            font-weight: 500;
+        }
+
+        .passed-yes {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        #result-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 1.5rem;
+            text-align: right;
+            padding: 1rem;
+            background: #F3F4F6;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GPA Calculator</h1>
+        <h2>Computer Science (Major) (ENG)</h2>
+    </header>
+
+    <div class="container">
+        <div class="controls">
+            <div class="btn-group">
+                <div>
+                    <button onclick="calculateGPA(false)">Calculate</button>
+                </div>
+                <div>
+                    <button onclick="calculateGPA(true)">Calculate with Introduction to AI</button>
+                    <div class="ai-btn-desc">
+                        *Assumes final score for "Introduction to Artificial Intelligence (ENG)" = current accumulated (70) + 30 final exam points = 100.
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-wrapper">
+                <span class="info-icon">i</span>
+                <div class="tooltip-modal">
+                    <h3>LEPL Ilia State University GPA Calculation Rules</h3>
+                    <p>1. At Ilia State University, the GPA (Grade Point Average) represents the quotient of the sum of the products of (the GP (Grade Point) earned within each course) and (the credits obtained for each course), divided by the sum of the credits of the courses completed by the student.<br>
+                    <strong>GPA = Σ (GP of each course × Credits of each course) / Σ (Sum of credits of each course)</strong></p>
+                    <p>2. GP (Grade Point) represents the converted score of the grade received within one course, on a 4-point scale.</p>
+                    <p>3. According to the GP system, the grading scale is divided into the following categories:</p>
+                    <ul>
+                        <li>F - 0-50 points (0 points, Fail)</li>
+                        <li>E - 51-60 points</li>
+                        <li>D - 61-70 points</li>
+                        <li>C - 71-80 points</li>
+                        <li>B - 81-90 points</li>
+                        <li>A - 91-95 points</li>
+                        <li>A+ - 96-100 points</li>
+                    </ul>
+                    <p>4. According to the GP system, within each course, a grade in category E (51-60) is unchanged and equals 1.00 GP; grades in categories D, C, B, and A (from 61 up to and including 95 points) increase equally in increments of 1/12 (≈0.08); a grade in category A+ (from 96 up to and including 100 points) is unchanged and equals 4.00 GP.</p>
+                    <p>5. GPA is awarded at Ilia State University within all academic programs, except for the doctoral level of study. GPA is also not awarded for certificate programs.</p>
+                    <p>6. At Ilia State University, only the final GPA is issued, which is reflected in the diploma supplement. This does not apply to the one-tier program of Certified Physician (M.D.).</p>
+                    <p>7. When calculating the final GPA, fractional values are rounded to the nearest tenth.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-display">GPA: Not calculated yet</div>
+
+        <table id="courses-table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Credit</th>
+                    <th>Grade</th>
+                    <th>Passed</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Academic Techniques (ENG)</td><td>6</td><td>85.50</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Basics of Physics I (including Lab) (ENG)</td><td>8</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Basics of Physics II (ENG)</td><td>6</td><td>80.50</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Calculus I (ENG)</td><td>6</td><td>91.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Calculus II (ENG)</td><td>6</td><td>81.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Calculus III (ENG)</td><td>6</td><td>94.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>English Language Course C1-1 (ENG)</td><td>6</td><td>97.80</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>English Language Course C1-2 (ENG)</td><td>6</td><td>98.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Introduction to Linear Algebra (ENG)</td><td>6</td><td>96.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Introduction to Modern Thought I (ENG)</td><td>6</td><td>85.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>AWS Cloud Practitioner (ENG)</td><td>6</td><td>86.95</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Algorithms and Data Structures (ENG)</td><td>6</td><td>63.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Computational and Statistical Methods (ENG)</td><td>6</td><td>72.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Computer Organization (ENG)</td><td>6</td><td>94.10</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Computer and Data Networks (ENG)</td><td>6</td><td>90.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Cyberlaw and Ethics (ENG)</td><td>6</td><td>90.80</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Databases and Information Systems (ENG)</td><td>6</td><td>87.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Design Patterns (ENG)</td><td>6</td><td>95.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Drones (ENG)</td><td>6</td><td>92.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Elements of Computational Complexity (ENG)</td><td>6</td><td>61.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Introduction to Cyber Security (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Introduction to Operating Systems (ENG)</td><td>6</td><td>89.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Introduction to Programming (ENG)</td><td>6</td><td>92.76</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Mathematical Foundation of Computing (ENG)</td><td>6</td><td>88.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Object Oriented Programming (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Principles of Numerical Methods (ENG)</td><td>6</td><td>84.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Programming Languages (ENG)</td><td>6</td><td>88.00</td><td class="passed-yes">Yes</td></tr>
+
+                <tr><td>Distributed and Parallel Computing (ENG)</td><td>6</td><td>0.00</td><td class="passed-no">No</td></tr>
+                <tr><td>Introduction to Artificial Intelligence (ENG)</td><td>6</td><td>70.00</td><td class="passed-no">No</td></tr>
+                <tr><td>Introduction to machine learning (ENG)</td><td>6</td><td>53.50</td><td class="passed-no">No</td></tr>
+
+                <tr><td>Computer and Society (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>DevOps Technologies (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Functional Programming (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>IT Project Management (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+                <tr><td>Nand2Tetris (ENG)</td><td>6</td><td>100.00</td><td class="passed-yes">Yes</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        /**
+         * Calculates GP (Grade Point) based on a 4-point scale logic provided in rules.
+         */
+        function calculateGP(score) {
+            if (score <= 50) return 0.00;
+            if (score <= 60) return 1.00;
+            if (score <= 95) return 1.00 + ((score - 60) * (1 / 12));
+            return 4.00;
+        }
+
+        function calculateGPA(assumeAIFinished) {
+            const table = document.getElementById('courses-table');
+            const rows = table.querySelectorAll('tbody tr');
+            
+            let totalGP = 0;
+            let totalCredits = 0;
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const courseName = cells[0].innerText.trim();
+                const credits = parseFloat(cells[1].innerText);
+                let score = parseFloat(cells[2].innerText);
+                let passedStr = cells[3].innerText.trim().toLowerCase();
+                let isPassed = (passedStr === 'yes');
+
+                // Logic for "Calculate with Introduction to AI"
+                if (assumeAIFinished && courseName === 'Introduction to Artificial Intelligence (ENG)') {
+                    score = Math.min(score + 30, 100); // 70 + 30 = 100 max
+                    isPassed = true;
+                }
+
+                // GPA is calculated based on completed (passed) courses
+                if (isPassed) {
+                    const gp = calculateGP(score);
+                    totalGP += (gp * credits);
+                    totalCredits += credits;
+                }
+            });
+
+            if (totalCredits === 0) {
+                document.getElementById('result-display').innerText = "GPA: N/A";
+                return;
+            }
+
+            const rawGpa = totalGP / totalCredits;
+            // Fractional values are rounded to the nearest tenth as per rule 7
+            const roundedGpa = (Math.round(rawGpa * 10) / 10).toFixed(1);
+
+            document.getElementById('result-display').innerText = `Calculated GPA: ${roundedGpa}`;
+        }
+    </script>
+</body>
+</html>
